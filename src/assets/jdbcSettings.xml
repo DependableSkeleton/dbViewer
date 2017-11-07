@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+ <type>jdbc-mysql</type>
+ <user>admin</user>
+ <pass>password</pass>
+ <url>jdbc:mysql://localhost:3306/</url>
+ <schema>sys</schema>
+ <date_format>yyyy-MM-dd HH:mm:ss</date_format>
+ <prefix_package>false</prefix_package>
+ <use_ssl>false</use_ssl>
+ <auto_reconnect>true</auto_reconnect>
+</settings>

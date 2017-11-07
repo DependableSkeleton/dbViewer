@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import logic.DatabaseController;
 
 public class StageController extends Application {
+	
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -31,7 +32,8 @@ public class StageController extends Application {
 		stage.show();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		new DatabaseController();
 		Application.launch(args);
 	}
 
@@ -96,64 +98,41 @@ public class StageController extends Application {
 	 */
 	public class Administration extends Scene {
 
-		Button createDB;
-		Button init;
+		Button createTable;
+		Button createdb;
 		Button show;
 		Button exitButton;
 
 		public Administration(Group root, Stage stage) {
 			super(root, 600, 550);
-			createDB = new Button("Create database");
-			init = new Button("Initalize database");
+			createTable = new Button("Create table");
+			createdb = new Button("Initalize database");
 			show = new Button("View database");
 			exitButton = new Button("Exit");
 
-			exitButton.setOnAction(e -> {
+			exitButton.setOnAction(event -> {
 				stage.setScene(new HomePage(new Group(), stage));
 			});
 
-			createDB.setOnAction(e -> {
-				boolean dbexist = false;
+			createTable.setOnAction(event -> {
 				try {
-					dbexist = DatabaseController.checkConnection();
-				} catch (ClassNotFoundException | SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				if (dbexist == false) {
-					new Alert(AlertType.INFORMATION, "Database Created!").show();
-					new Alert(AlertType.INFORMATION, "Table created succesfully!");
-					init.setDisable(false);
-				} else {
-					new Alert(AlertType.INFORMATION, "Database Already exist!");
+					DatabaseController.createTable();
+				} catch (SQLException e) {
+					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage()).showAndWait();
 				}
 			});
 
-			init.setOnAction(e -> {
-				boolean dbexist = false;
+			createdb.setOnAction(event -> {
 				try {
-					dbexist = DatabaseController.checkConnection();
-				} catch (ClassNotFoundException | SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					DatabaseController.createdb();
+				} catch (SQLException e) {
+					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage()).showAndWait();
 				}
-				if (dbexist == false) {
-					new Alert(AlertType.INFORMATION, "Database doesn't exist, create one first");
-					init.setDisable(true);
-				} else {
-					try {
-						DatabaseController.readToDB();
-					} catch (ClassNotFoundException | SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-
 			});
 
 			GridPane gridpane = new GridPane();
-			gridpane.add(createDB, 0, 0);
-			gridpane.add(init, 1, 0);
+			gridpane.add(createTable, 0, 0);
+			gridpane.add(createdb, 1, 0);
 			gridpane.add(show, 2, 0);
 			gridpane.add(exitButton, 2, 4);
 			gridpane.setAlignment(Pos.CENTER);
