@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -33,36 +34,48 @@ public class DatabaseController {
 	private static ArrayList<String> lastName = new ArrayList<>();
 	private static ArrayList<String> firstName = new ArrayList<>();
 	private static ArrayList<Integer> groupNum = new ArrayList<>();
+	
+	// -- DatabaseController
+	XPath xpath;
+	String xpathExpression;
+	InputSource inputSource;
+	NodeList firstRoot;
+	NodeList firstChild;
+	
+	// -- updateRecord
+	String recordCheck;
+	String updateRecord;
 
 	public DatabaseController() throws ClassNotFoundException, SQLException {
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		String xpathExpression = "/settings";
-		InputSource inputSource = new InputSource("src/assets/jdbcSettings.xml");
+		xpath = XPathFactory.newInstance().newXPath();
+		xpathExpression = "/settings";
+		inputSource = new InputSource("src/assets/jdbcSettings.xml");
+		stm = database.createStatement();
 		try {
 
-			NodeList lstRoot = (NodeList) xpath.compile(xpathExpression).evaluate(inputSource, XPathConstants.NODESET);
-			NodeList lstChilds = lstRoot.item(0).getChildNodes();
+			firstRoot = (NodeList) xpath.compile(xpathExpression).evaluate(inputSource, XPathConstants.NODESET);
+			firstChild = firstRoot.item(0).getChildNodes();
 
 			// parse jdbcSettings.xml for config
-			for (int i = 3; i < lstChilds.getLength(); i++) {
-				if (lstChilds.item(i).getLocalName() != null) {
+			for (int i = 3; i < firstChild.getLength(); i++) {
+				if (firstChild.item(i).getLocalName() != null) {
 
-					switch (lstChilds.item(i).getLocalName()) {
+					switch (firstChild.item(i).getLocalName()) {
 					case "user":
-						user = lstChilds.item(i).getTextContent();
+						user = firstChild.item(i).getTextContent();
 						break;
 					case "pass":
-						pass = lstChilds.item(i).getTextContent();
+						pass = firstChild.item(i).getTextContent();
 						break;
 					case "url":
-						url = lstChilds.item(i).getTextContent();
+						url = firstChild.item(i).getTextContent();
 						break;
 					case "schema":
-						schema = lstChilds.item(i).getTextContent();
+						schema = firstChild.item(i).getTextContent();
 						url += schema;
 						break;
 					case "use_ssl":
-						if (lstChilds.item(i).getTextContent().compareTo("false") == 0) {
+						if (firstChild.item(i).getTextContent().compareTo("false") == 0) {
 							url += "?useSSL=false";
 						}
 						break;
@@ -128,10 +141,9 @@ public class DatabaseController {
 				groupNum.add(new Integer(inputStream.nextLine().substring(1)));
 			}
 			// Since database created successfully, program creates a table.
-			stm = database.createStatement();
 			// sql statement to create the table
-			String createTable = "CREATE TABLE Players (" + "First_Name VARCHAR (20)     NOT NULL, "
-					+ "Last_Name VARCHAR (20)     NOT NULL, " + "Group_number int, " + "Password VARCHAR (20), "
+			String createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
+					+ "LastName VARCHAR (20)     NOT NULL, " + "GroupNumber int, " + "Password VARCHAR (20), "
 					+ "Perfered_Car_Name VARCHAR (20) , "
 					+ "logo VARCHAR (20) , score int, logIn VARCHAR(20), Credits int);";
 			stm.executeUpdate(createTable);
@@ -142,13 +154,20 @@ public class DatabaseController {
 		}
 	}
 
-	public static void checkRecord() {
-		// Check info to record
-		// Compare record
-	}
-
-	public static void updateRecord() {
-		// Add data into record
+	public static void updateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
+		String recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName + "' AND GroupNum ='" + groupNum + "'");
+		ResultSet rs = stm.executeQuery(recordCheck);
+		
+		//if the record is not found and SQLException will be thrown and caught
+		if(rs.next()) {
+			//Now create an update statement to add all the other fields;
+			String updateRecord = "UPDATE Players SET Username = '" + username + "', "
+					+ "Password = '" + password +"', Car  = '" + carName + "', Logo = '"
+							+ logo + "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName
+							+"' AND LastName LIKE '" + lastName
+							+ "' AND GroupNumber =" + groupNumber + ";" ; 
+			stm.executeUpdate(updateRecord);
+		}
 	}
 
 	public static Connection getDatabase() {
