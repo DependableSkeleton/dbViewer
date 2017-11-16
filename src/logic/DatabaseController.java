@@ -1,6 +1,7 @@
 package logic;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -89,69 +90,43 @@ public class DatabaseController {
 		Class.forName(jdbcDriver);
 	}
 
-	private static boolean connectToServer() {
-		// establish connection
-		try {
-			database = DriverManager.getConnection(url, user, pass);
-			return true;
-		} catch (Exception SQLException) {
-			new Alert(AlertType.ERROR, "Could not connect to server.").showAndWait();
-			return false;
-		}
-	}
-
-	private static boolean connectTodb() {
-		try {
-			database.setSchema(schema);
-			new Alert(AlertType.INFORMATION, "Connected to database: " + schema).showAndWait();
-			return true;
-		} catch (Exception SQLException) {
-			new Alert(AlertType.CONFIRMATION, "Database doesn't exist, creating new one.").showAndWait();
-			return false;
-		}
-	}
-
 	public static void createdb() throws SQLException {
-		if (connectToServer() && !connectTodb()) {
-			// Create database
-			ps = database.prepareStatement("CREATE DATABASE ?");
-			ps.setString(1, schema);
-			System.out.println(ps);
-			ps.execute();
-			ps.close();
-			database.close();
-		}
+		database = DriverManager.getConnection(url, user, pass);
+		database.setSchema(schema);
+		// Create database
+		ps = database.prepareStatement("CREATE DATABASE ?");
+		ps.setString(1, schema);
+		System.out.println(ps);
+		ps.execute();
+		ps.close();
+		database.close();
 	}
 
-	public static void createTable() throws SQLException {
-		if (connectToServer() && connectTodb()) {
-			Scanner inputStream = null;
-			lastName = new ArrayList<>();
-			firstName = new ArrayList<>();
-			groupNum = new ArrayList<>();
-			try {
-				inputStream = new Scanner(new File("src/logic/Prog32758Students.txt"));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			inputStream.useDelimiter(",");
-			while (inputStream.hasNext()) {
-				lastName.add(inputStream.next());
-				firstName.add(inputStream.next());
-				groupNum.add(new Integer(inputStream.nextLine().substring(1)));
-			}
-			// Since database created successfully, program creates a table.
-			// sql statement to create the table
-			String createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
-					+ "LastName VARCHAR (20)     NOT NULL, " + "GroupNumber int, " + "Password VARCHAR (20), "
-					+ "Perfered_Car_Name VARCHAR (20) , "
-					+ "logo VARCHAR (20) , score int, logIn VARCHAR(20), Credits int);";
-			stm.executeUpdate(createTable);
-			// close the statement stream and the database connection
-			stm.close();
-			database.close();
-			inputStream.close();
+	public static void createTable() throws SQLException, FileNotFoundException {
+		database = DriverManager.getConnection(url, user, pass);
+		database.setSchema(schema);
+		Scanner inputStream = null;
+		lastName = new ArrayList<>();
+		firstName = new ArrayList<>();
+		groupNum = new ArrayList<>();
+		inputStream = new Scanner(new File("src/logic/Prog32758Students.txt"));
+		inputStream.useDelimiter(",");
+		while (inputStream.hasNext()) {
+			lastName.add(inputStream.next());
+			firstName.add(inputStream.next());
+			groupNum.add(new Integer(inputStream.nextLine().substring(1)));
 		}
+		// Since database created successfully, program creates a table.
+		// sql statement to create the table
+		String createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
+				+ "LastName VARCHAR (20)     NOT NULL, " + "GroupNumber int, " + "Password VARCHAR (20), "
+				+ "Perfered_Car_Name VARCHAR (20) , "
+				+ "logo VARCHAR (20) , score int, logIn VARCHAR(20), Credits int);";
+		stm.executeUpdate(createTable);
+		// close the statement stream and the database connection
+		stm.close();
+		database.close();
+		inputStream.close();
 	}
 
 	public static void updateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
