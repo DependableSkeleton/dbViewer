@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -34,8 +35,10 @@ public class StageController extends Application {
 	}
 
 	public static void main(String[] args) {
-		/* 
-		 * 'Platform' lambda expression found: https://stackoverflow.com/questions/17850191/why-am-i-getting-java-lang-illegalstateexception-not-on-fx-application-thread
+		/*
+		 * 'Platform' lambda expression found:
+		 * https://stackoverflow.com/questions/17850191/why-am-i-getting-java-lang-
+		 * illegalstateexception-not-on-fx-application-thread
 		 */
 		// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
 		Platform.runLater(() -> {
@@ -138,6 +141,8 @@ public class StageController extends Application {
 				} catch (SQLException e) {
 					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
 							.showAndWait();
+				} catch (FileNotFoundException e) {
+					new Alert(AlertType.ERROR, "Missing student list file. " + e.getMessage()).showAndWait();
 				}
 			});
 
@@ -198,7 +203,7 @@ public class StageController extends Application {
 		PasswordField pwTF;
 		Button submitButton;
 		VBox vbox;
-		
+
 		public Login(Parent root, Stage stage) {
 			super(root);
 
@@ -223,9 +228,11 @@ public class StageController extends Application {
 			submitButton.setOnAction(e -> {
 				try {
 					DatabaseController.validateRecord(unTF.getText(), pwTF.getText());
-					new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!").showAndWait();
+					new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!")
+							.showAndWait();
 				} catch (SQLException e1) {
-					new Alert(AlertType.ERROR, "User: " + unTF.getText() + " not found, you must be registered to login.").showAndWait();
+					new Alert(AlertType.ERROR,
+							"User: " + unTF.getText() + " not found, you must be registered to login.").showAndWait();
 				}
 			});
 
@@ -254,7 +261,7 @@ public class StageController extends Application {
 		Label logoL;
 		TextField logoTF;
 		Button registerButton;
-		
+
 		public Register(Parent root, Stage stage) {
 			super(root);
 			gridPane = new GridPane();
@@ -314,11 +321,15 @@ public class StageController extends Application {
 			registerButton = new Button("Submit");
 			registerButton.setOnAction(e -> {
 				try {
-					DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(), Integer.getInteger(gnTF.getText()),
-							unTF.getText(), pwdTF.getText(), cnTF.getText(), logoTF.getText());
-					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!").showAndWait();
+					DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(),
+							Integer.getInteger(gnTF.getText()), unTF.getText(), pwdTF.getText(), cnTF.getText(),
+							logoTF.getText());
+					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!")
+							.showAndWait();
 				} catch (SQLException e1) {
-					new Alert(AlertType.ERROR, "User: " + fnTF.getText() + " not found, you must be part of the class to register.").showAndWait();
+					new Alert(AlertType.ERROR,
+							"User: " + fnTF.getText() + " not found, you must be part of the class to register.")
+									.showAndWait();
 				}
 			});
 
