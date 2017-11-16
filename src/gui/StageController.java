@@ -23,17 +23,20 @@ import javafx.stage.Stage;
 import logic.DatabaseController;
 
 public class StageController extends Application {
-	
 
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start(Stage stage) {
 		// TODO Implement two buttons to switch scenes
 		stage.setScene(new HomePage(new Group(), stage));
 		stage.show();
 	}
 
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		new DatabaseController();
+	public static void main(String[] args) {
+		try {
+			new DatabaseController();
+		} catch (ClassNotFoundException | SQLException e) {
+			new Alert(AlertType.ERROR, "Fatal program error! DatabaseController not initialising. Report to system admin.").showAndWait();
+		}
 		Application.launch(args);
 	}
 
@@ -57,7 +60,7 @@ public class StageController extends Application {
 			super(root, 600, 550);
 			adminButton = new Button("Admin button");
 			userButton = new Button("User");
-			// Sheridan Image object and image viewer
+			// Sheridan image object and image viewer
 			img = new Image(
 					"file:///C:/Users/Lucas%20Turner/Google%20Drive/Code/workspace/dbViewer/src/assets/g2.jpeg");
 			sheridanImg = new ImageView(img);
@@ -118,7 +121,8 @@ public class StageController extends Application {
 				try {
 					DatabaseController.createTable();
 				} catch (SQLException e) {
-					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage()).showAndWait();
+					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
+							.showAndWait();
 				}
 			});
 
@@ -126,7 +130,8 @@ public class StageController extends Application {
 				try {
 					DatabaseController.createdb();
 				} catch (SQLException e) {
-					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage()).showAndWait();
+					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
+							.showAndWait();
 				}
 			});
 
@@ -229,41 +234,39 @@ public class StageController extends Application {
 			gridPane.add(lastNameL, 0, 1);
 			gridPane.add(lnTF, 1, 1);
 
-			Label groupL = new Label("Group");
-			TextField groupTF = new TextField();
-			groupTF.setPromptText("Group");
-			gridPane.add(groupL, 0, 2);
-			gridPane.add(groupTF, 1, 2);
+			Label groupNumL = new Label("Group");
+			TextField gnTF = new TextField();
+			gnTF.setPromptText("Group");
+			gridPane.add(groupNumL, 0, 2);
+			gridPane.add(gnTF, 1, 2);
 
-			Label loginL = new Label("Login");
-			TextField logInTF = new TextField();
-			logInTF.setPromptText("log in");
-			gridPane.add(loginL, 0, 3);
-			gridPane.add(logInTF, 1, 3);
+			Label usernameL = new Label("New Username");
+			TextField unTF = new TextField();
+			unTF.setPromptText("New Username");
+			gridPane.add(usernameL, 0, 3);
+			gridPane.add(unTF, 1, 3);
 
-			Label passwordL = new Label("Password");
+			Label passwordL = new Label("New Password");
 			TextField pwdTF = new TextField();
-			pwdTF.setPromptText("Password");
+			pwdTF.setPromptText("New Password");
 			gridPane.add(passwordL, 0, 4);
 			gridPane.add(pwdTF, 1, 4);
 
-			Label carNameL = new Label("perfered car name");
-			TextField carNameTF = new TextField();
-			carNameTF.setPromptText("Car name");
+			Label carNameL = new Label("New Car Name");
+			TextField cnTF = new TextField();
+			cnTF.setPromptText("New Car Name");
 			gridPane.add(carNameL, 0, 5);
-			gridPane.add(carNameTF, 1, 5);
+			gridPane.add(cnTF, 1, 5);
 
-			Label creditL = new Label("Credit");
-			TextField creditTF = new TextField();
-			creditTF.setPromptText("Credit");
-			gridPane.add(creditL, 0, 6);
-			gridPane.add(creditTF, 1, 6);
-
-			Label scoreL = new Label("Score");
-			TextField scoreTF = new TextField();
-			scoreTF.setPromptText("score");
-			gridPane.add(scoreL, 0, 7);
-			gridPane.add(scoreTF, 1, 7);
+			/*
+			 * Label creditL = new Label("Credit"); TextField creditTF = new TextField();
+			 * creditTF.setPromptText("Credit"); gridPane.add(creditL, 0, 6);
+			 * gridPane.add(creditTF, 1, 6);
+			 * 
+			 * Label scoreL = new Label("Score"); TextField scoreTF = new TextField();
+			 * scoreTF.setPromptText("score"); gridPane.add(scoreL, 0, 7);
+			 * gridPane.add(scoreTF, 1, 7);
+			 */
 
 			Label logoL = new Label("Logo");
 			TextField logoTF = new TextField();
@@ -271,10 +274,15 @@ public class StageController extends Application {
 			gridPane.add(logoL, 0, 8);
 			gridPane.add(logoTF, 1, 8);
 
-			Button registerButton = new Button("Register");
+			Button registerButton = new Button("Submit");
 			registerButton.setOnAction(e -> {
-				System.out.println("runnig..");
-				// some logic here to check if the person is registered
+				try {
+					DatabaseController.updateRecord(fnTF.getText(), lnTF.getText(), Integer.getInteger(gnTF.getText()),
+							unTF.getText(), pwdTF.getText(), cnTF.getText(), logoTF.getText());
+					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!").showAndWait();
+				} catch (SQLException e1) {
+					new Alert(AlertType.ERROR, "User: " + fnTF.getText() + " not found, you must be part of the class to register.").showAndWait();
+				}
 			});
 
 			gridPane.add(registerButton, 1, 9);
