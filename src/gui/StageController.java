@@ -1,8 +1,10 @@
 package gui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -32,12 +34,24 @@ public class StageController extends Application {
 	}
 
 	public static void main(String[] args) {
-		try {
-			new DatabaseController();
-		} catch (ClassNotFoundException | SQLException e) {
-			new Alert(AlertType.ERROR, "Fatal program error! DatabaseController not initialising. Report to system admin.").showAndWait();
-		}
-		Application.launch(args);
+		/* 
+		 * 'Platform' lambda expression found: https://stackoverflow.com/questions/17850191/why-am-i-getting-java-lang-illegalstateexception-not-on-fx-application-thread
+		 */
+		// Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+		Platform.runLater(() -> {
+			// Update UI here.
+			try {
+				new DatabaseController();
+				Application.launch(args);
+			} catch (ClassNotFoundException | SQLException e) {
+				new Alert(AlertType.ERROR,
+						"Fatal program error! DatabaseController not initialising. Report to system admin. "
+								+ e.getMessage()).showAndWait();
+			} catch (NullPointerException e) {
+				new Alert(AlertType.ERROR, "Fatal program error! Database connection not valid. " + e.getMessage())
+						.showAndWait();
+			}
+		});
 	}
 
 	/*
