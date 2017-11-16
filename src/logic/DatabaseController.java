@@ -153,11 +153,21 @@ public class DatabaseController {
 			inputStream.close();
 		}
 	}
+	
+	public static boolean validateRecord(String username, String password) throws SQLException {
+		String recordCheck = ("SELECT * FROM Players WHERE Username = '" + username + "' AND Password ='" + password + "';");
+		ResultSet rs = stm.executeQuery(recordCheck);
+		//if the record is not found and SQLException will be thrown and caught
+		if(rs.next()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-	public static void updateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
+	public static boolean validateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
 		String recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName + "' AND GroupNum ='" + groupNum + "'");
 		ResultSet rs = stm.executeQuery(recordCheck);
-		
 		//if the record is not found and SQLException will be thrown and caught
 		if(rs.next()) {
 			//Now create an update statement to add all the other fields;
@@ -167,11 +177,9 @@ public class DatabaseController {
 							+"' AND LastName LIKE '" + lastName
 							+ "' AND GroupNumber =" + groupNumber + ";" ; 
 			stm.executeUpdate(updateRecord);
+			return true;
+		} else {
+			return false;
 		}
 	}
-
-	public static Connection getDatabase() {
-		return database;
-	}
-
 }
