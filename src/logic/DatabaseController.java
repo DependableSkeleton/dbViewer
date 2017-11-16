@@ -19,35 +19,22 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-
 public class DatabaseController {
-
-	private static Connection database;
-	private static PreparedStatement ps;
-	private static Statement stm;
 	final static String jdbcDriver = "com.mysql.jdbc.Driver";
+	private static Connection database;
+	private static Statement stm;
 	private static String url = null;
 	private static String user = null;
 	private static String pass = null;
 	private static String schema = null;
-	private static ArrayList<String> lastName = new ArrayList<>();
-	private static ArrayList<String> firstName = new ArrayList<>();
-	private static ArrayList<Integer> groupNum = new ArrayList<>();
 	
-	// -- DatabaseController
-	XPath xpath;
-	String xpathExpression;
-	InputSource inputSource;
-	NodeList firstRoot;
-	NodeList firstChild;
-	
-	// -- updateRecord
-	String recordCheck;
-	String updateRecord;
-
 	public DatabaseController() throws ClassNotFoundException, SQLException {
+		XPath xpath;
+		String xpathExpression;
+		InputSource inputSource;
+		NodeList firstRoot;
+		NodeList firstChild;
+		
 		xpath = XPathFactory.newInstance().newXPath();
 		xpathExpression = "/settings";
 		inputSource = new InputSource("src/assets/jdbcSettings.xml");
@@ -91,24 +78,27 @@ public class DatabaseController {
 	}
 
 	public static void createdb() throws SQLException {
+		PreparedStatement ps;
+		
 		database = DriverManager.getConnection(url, user, pass);
 		database.setSchema(schema);
 		// Create database
 		ps = database.prepareStatement("CREATE DATABASE ?");
 		ps.setString(1, schema);
-		System.out.println(ps);
 		ps.execute();
 		ps.close();
 		database.close();
 	}
 
 	public static void createTable() throws SQLException, FileNotFoundException {
+		Scanner inputStream;
+		ArrayList<String> lastName = new ArrayList<>();
+		ArrayList<String> firstName = new ArrayList<>();
+		ArrayList<Integer> groupNum = new ArrayList<>();
+		String createTable;
+		
 		database = DriverManager.getConnection(url, user, pass);
 		database.setSchema(schema);
-		Scanner inputStream = null;
-		lastName = new ArrayList<>();
-		firstName = new ArrayList<>();
-		groupNum = new ArrayList<>();
 		inputStream = new Scanner(new File("src/logic/Prog32758Students.txt"));
 		inputStream.useDelimiter(",");
 		while (inputStream.hasNext()) {
@@ -118,7 +108,7 @@ public class DatabaseController {
 		}
 		// Since database created successfully, program creates a table.
 		// sql statement to create the table
-		String createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
+		createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
 				+ "LastName VARCHAR (20)     NOT NULL, " + "GroupNumber int, " + "Password VARCHAR (20), "
 				+ "Perfered_Car_Name VARCHAR (20) , "
 				+ "logo VARCHAR (20) , score int, logIn VARCHAR(20), Credits int);";
@@ -129,24 +119,26 @@ public class DatabaseController {
 		inputStream.close();
 	}
 
-	public static void updateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
-		String recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName + "' AND GroupNum ='" + groupNum + "'");
-		ResultSet rs = stm.executeQuery(recordCheck);
+	public static void updateRecord(String firstName, String lastName, int groupNumber, String username,
+			String password, String carName, String logo) throws SQLException {
+		String recordCheck;
+		String updateRecord;
+		ResultSet rs;
 		
-		//if the record is not found and SQLException will be thrown and caught
-		if(rs.next()) {
-			//Now create an update statement to add all the other fields;
-			String updateRecord = "UPDATE Players SET Username = '" + username + "', "
-					+ "Password = '" + password +"', Car  = '" + carName + "', Logo = '"
-							+ logo + "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName
-							+"' AND LastName LIKE '" + lastName
-							+ "' AND GroupNumber =" + groupNumber + ";" ; 
+		recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName
+				+ "' AND GroupNum ='" + groupNumber + "'");
+		
+		rs = stm.executeQuery(recordCheck);
+		
+		// Check if the student record exists
+		if (rs.next()) {
+
+			updateRecord = "UPDATE Players SET Username = '" + username + "', " + "Password = '" + password
+					+ "', Car  = '" + carName + "', Logo = '" + logo
+					+ "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName + "' AND LastName LIKE '"
+					+ lastName + "' AND GroupNumber =" + groupNumber + ";";
+
 			stm.executeUpdate(updateRecord);
 		}
 	}
-
-	public static Connection getDatabase() {
-		return database;
-	}
-
 }

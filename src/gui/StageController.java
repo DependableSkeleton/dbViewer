@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 import javafx.application.Application;
@@ -123,6 +124,9 @@ public class StageController extends Application {
 				} catch (SQLException e) {
 					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
 							.showAndWait();
+				} catch (FileNotFoundException e) {
+					new Alert(AlertType.ERROR, "Missing student list file. " + e.getMessage())
+					.showAndWait();
 				}
 			});
 
