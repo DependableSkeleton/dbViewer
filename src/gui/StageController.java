@@ -53,6 +53,12 @@ public class StageController extends Application {
 			} catch (NullPointerException e) {
 				new Alert(AlertType.ERROR, "Fatal program error! Database connection not valid. " + e.getMessage())
 						.showAndWait();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		});
 	}

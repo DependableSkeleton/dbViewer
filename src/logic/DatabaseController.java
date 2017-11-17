@@ -24,7 +24,7 @@ import javafx.scene.control.Alert.AlertType;
 
 public class DatabaseController {
 
-	final static String jdbcDriver = "com.mysql.jdbc.Driver";
+	final static String jdbcDriver = "com.mysql.jdbc";
 	private static Connection database;
 	private static Statement stm;
 	private static String url = null;
@@ -32,7 +32,7 @@ public class DatabaseController {
 	private static String pass = null;
 	private static String schema = null;
 
-	public DatabaseController() throws ClassNotFoundException, SQLException {
+	public DatabaseController() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
 		XPath xpath;
 		String xpathExpression;
 		InputSource inputSource;
@@ -42,16 +42,12 @@ public class DatabaseController {
 		xpath = XPathFactory.newInstance().newXPath();
 		xpathExpression = "/settings";
 		inputSource = new InputSource("src/assets/jdbcSettings.xml");
-		stm = database.createStatement();
 		try {
-
 			firstRoot = (NodeList) xpath.compile(xpathExpression).evaluate(inputSource, XPathConstants.NODESET);
 			firstChild = firstRoot.item(0).getChildNodes();
-
 			// parse jdbcSettings.xml for config
 			for (int i = 3; i < firstChild.getLength(); i++) {
 				if (firstChild.item(i).getLocalName() != null) {
-
 					switch (firstChild.item(i).getLocalName()) {
 					case "user":
 						user = firstChild.item(i).getTextContent();
@@ -74,11 +70,11 @@ public class DatabaseController {
 					}
 				}
 			}
+			// connect driver
+			Class.forName(jdbcDriver).newInstance();
 		} catch (XPathExpressionException e) {
-			e.printStackTrace();
+			e.printStackTrace();	
 		}
-		// connect driver
-		Class.forName(jdbcDriver);
 	}
 
 
