@@ -19,12 +19,9 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-
 public class DatabaseController {
 
-	final static String jdbcDriver = "com.mysql.jdbc";
+	final static String jdbcDriver = "com.mysql.jdbc.Driver";
 	private static Connection database;
 	private static Statement stm;
 	private static String url = null;
@@ -32,7 +29,7 @@ public class DatabaseController {
 	private static String pass = null;
 	private static String schema = null;
 
-	public DatabaseController() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+	public static void parseXML() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		XPath xpath;
 		String xpathExpression;
 		InputSource inputSource;
@@ -71,16 +68,16 @@ public class DatabaseController {
 				}
 			}
 			// connect driver
-			Class.forName(jdbcDriver).newInstance();
+			Class.forName(jdbcDriver);
 		} catch (XPathExpressionException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		}
-	}
 
+	}
 
 	public static void createdb() throws SQLException {
 		PreparedStatement ps;
-		
+
 		database = DriverManager.getConnection(url, user, pass);
 		database.setSchema(schema);
 		// Create database
@@ -89,7 +86,7 @@ public class DatabaseController {
 		ps.execute();
 		ps.close();
 		database.close();
-}
+	}
 
 	public static void createTable() throws SQLException, FileNotFoundException {
 		Scanner inputStream;
@@ -97,7 +94,7 @@ public class DatabaseController {
 		ArrayList<String> firstName = new ArrayList<>();
 		ArrayList<Integer> groupNum = new ArrayList<>();
 		String createTable;
-		
+
 		database = DriverManager.getConnection(url, user, pass);
 		database.setSchema(schema);
 		inputStream = new Scanner(new File("src/logic/Prog32758Students.txt"));
@@ -118,30 +115,32 @@ public class DatabaseController {
 		stm.close();
 		database.close();
 		inputStream.close();
-}
-	
+	}
+
 	public static boolean validateRecord(String username, String password) throws SQLException {
-		String recordCheck = ("SELECT * FROM Players WHERE Username = '" + username + "' AND Password ='" + password + "';");
+		String recordCheck = ("SELECT * FROM Players WHERE Username = '" + username + "' AND Password ='" + password
+				+ "';");
 		ResultSet rs = stm.executeQuery(recordCheck);
-		//if the record is not found and SQLException will be thrown and caught
-		if(rs.next()) {
+		// if the record is not found and SQLException will be thrown and caught
+		if (rs.next()) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public static boolean validateRecord(String firstName, String lastName, int groupNumber, String username, String password, String carName, String logo) throws SQLException {
-		String recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName + "' AND GroupNum ='" + groupNumber + "'");
+	public static boolean validateRecord(String firstName, String lastName, int groupNumber, String username,
+			String password, String carName, String logo) throws SQLException {
+		String recordCheck = ("SELECT * FROM Players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName
+				+ "' AND GroupNum ='" + groupNumber + "'");
 		ResultSet rs = stm.executeQuery(recordCheck);
-		//if the record is not found and SQLException will be thrown and caught
-		if(rs.next()) {
-			//Now create an update statement to add all the other fields;
-			String updateRecord = "UPDATE Players SET Username = '" + username + "', "
-					+ "Password = '" + password +"', Car  = '" + carName + "', Logo = '"
-							+ logo + "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName
-							+"' AND LastName LIKE '" + lastName
-							+ "' AND GroupNumber =" + groupNumber + ";" ; 
+		// if the record is not found and SQLException will be thrown and caught
+		if (rs.next()) {
+			// Now create an update statement to add all the other fields;
+			String updateRecord = "UPDATE Players SET Username = '" + username + "', " + "Password = '" + password
+					+ "', Car  = '" + carName + "', Logo = '" + logo
+					+ "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName + "' AND LastName LIKE '"
+					+ lastName + "' AND GroupNumber =" + groupNumber + ";";
 			stm.executeUpdate(updateRecord);
 			return true;
 		} else {

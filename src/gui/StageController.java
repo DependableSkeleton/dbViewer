@@ -1,7 +1,6 @@
 package gui;
 
 import java.io.FileNotFoundException;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import javafx.application.Application;
@@ -44,9 +43,8 @@ public class StageController extends Application {
 		Platform.runLater(() -> {
 			// Update UI here.
 			try {
-				new DatabaseController();
-				Application.launch(args);
-			} catch (ClassNotFoundException | SQLException e) {
+				DatabaseController.parseXML();
+			} catch (ClassNotFoundException e) {
 				new Alert(AlertType.ERROR,
 						"Fatal program error! DatabaseController not initialising. Report to system admin. "
 								+ e.getMessage()).showAndWait();
@@ -61,6 +59,7 @@ public class StageController extends Application {
 				e.printStackTrace();
 			}
 		});
+		launch(args);
 	}
 
 	/*
@@ -109,7 +108,7 @@ public class StageController extends Application {
 			});
 
 			userButton.setOnAction(e -> {
-				stage.setScene(new Login(new Group(), stage));
+				stage.setScene(new User(new Group(), stage));
 			});
 
 			stage.setTitle("Home page");
