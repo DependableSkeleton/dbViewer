@@ -83,11 +83,14 @@ public class DatabaseController {
 			try {
 				database = DriverManager.getConnection(url, user, pass);
 				database.setSchema(schema);
+				if (database.getSchema() == null) {
+					throw new SQLException();
+				}
 			} catch (SQLException e) {
 				// Create database
 				ps = database.prepareStatement("CREATE DATABASE ?");
 				ps.setString(1, schema);
-				ps.execute();
+				ps.executeUpdate();
 				ps.close();
 				database.close();
 			}
