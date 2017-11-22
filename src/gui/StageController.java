@@ -143,9 +143,9 @@ public class StageController extends Application {
 			createTable.setOnAction(event -> {
 				try {
 					DatabaseController.createTable();
-					new Alert(AlertType.INFORMATION, "Table: " + DatabaseController.getTable() + ", filled with student list.").showAndWait();
+					new Alert(AlertType.INFORMATION, "Table 'players', filled with student list.").showAndWait();
 				} catch (SQLException e) {
-					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
+					new Alert(AlertType.ERROR, "Unable to access database. " + e.getMessage())
 							.showAndWait();
 				} catch (FileNotFoundException e) {
 					new Alert(AlertType.ERROR, "Missing student list file. " + e.getMessage()).showAndWait();
@@ -155,9 +155,9 @@ public class StageController extends Application {
 			createdb.setOnAction(event -> {
 				try {
 					DatabaseController.createdb();
-					new Alert(AlertType.INFORMATION, "Successfully connected to database schema: " + DatabaseController.getSchema()).showAndWait();
+					new Alert(AlertType.INFORMATION, "Successfully connected to database: students").showAndWait();
 				} catch (SQLException e) {
-					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
+					new Alert(AlertType.ERROR, "Unable to access database. " + e.getMessage())
 							.showAndWait();
 				}
 			});
