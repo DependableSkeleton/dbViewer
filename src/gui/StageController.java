@@ -143,6 +143,7 @@ public class StageController extends Application {
 			createTable.setOnAction(event -> {
 				try {
 					DatabaseController.createTable();
+					new Alert(AlertType.INFORMATION, "Table: " + DatabaseController.getTable() + ", filled with student list.").showAndWait();
 				} catch (SQLException e) {
 					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
 							.showAndWait();
@@ -154,6 +155,7 @@ public class StageController extends Application {
 			createdb.setOnAction(event -> {
 				try {
 					DatabaseController.createdb();
+					new Alert(AlertType.INFORMATION, "Successfully connected to database schema: " + DatabaseController.getSchema()).showAndWait();
 				} catch (SQLException e) {
 					new Alert(AlertType.ERROR, "Connection to database lost unexpectedly. " + e.getMessage())
 							.showAndWait();

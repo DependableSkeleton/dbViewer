@@ -28,6 +28,7 @@ public class DatabaseController {
 	private static String user = null;
 	private static String pass = null;
 	private static String schema = null;
+	private static String table = null;
 
 	public static void parseXML() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		XPath xpath;
@@ -57,7 +58,9 @@ public class DatabaseController {
 						break;
 					case "schema":
 						schema = firstChild.item(i).getTextContent();
-						url += schema;
+						break;
+					case "table":
+						table = firstChild.item(i).getTextContent();
 						break;
 					case "use_ssl":
 						if (firstChild.item(i).getTextContent().compareTo("false") == 0) {
@@ -75,17 +78,20 @@ public class DatabaseController {
 
 	}
 
-	public static void createdb() throws SQLException {
+	public static void createdb() throws SQLException  {
 		PreparedStatement ps;
-
-		database = DriverManager.getConnection(url, user, pass);
-		database.setSchema(schema);
-		// Create database
-		ps = database.prepareStatement("CREATE DATABASE ?");
-		ps.setString(1, schema);
-		ps.execute();
-		ps.close();
-		database.close();
+			try {
+				database = DriverManager.getConnection(url, user, pass);
+				database.setSchema(schema);
+			} catch (SQLException e) {
+				// Create database
+				ps = database.prepareStatement("CREATE DATABASE ?");
+				ps.setString(1, schema);
+				ps.execute();
+				ps.close();
+				database.close();
+			}
+		
 	}
 
 	public static void createTable() throws SQLException, FileNotFoundException {
@@ -97,6 +103,7 @@ public class DatabaseController {
 
 		database = DriverManager.getConnection(url, user, pass);
 		database.setSchema(schema);
+		stm = database.createStatement();
 		inputStream = new Scanner(new File("src/logic/Prog32758Students.txt"));
 		inputStream.useDelimiter(",");
 		while (inputStream.hasNext()) {
@@ -106,10 +113,16 @@ public class DatabaseController {
 		}
 		// Since database created successfully, program creates a table.
 		// sql statement to create the table
-		createTable = "CREATE TABLE Players (" + "FirstName VARCHAR (20)     NOT NULL, "
-				+ "LastName VARCHAR (20)     NOT NULL, " + "GroupNumber int, " + "Password VARCHAR (20), "
-				+ "Perfered_Car_Name VARCHAR (20) , "
-				+ "logo VARCHAR (20) , score int, logIn VARCHAR(20), Credits int);";
+		createTable = ("CREATE TABLE " + table
+				+ " (FirstName VARCHAR (20) NOT NULL, "
+				+ "LastName VARCHAR (20) NOT NULL, "
+				+ "GroupNumber int, "
+				+ "PerferedCarName VARCHAR (20), "
+				+ "Logo VARCHAR (20), "
+				+ "Score int, "
+				+ "Username VARCHAR(20), "
+				+ "Pass VARCHAR (20), "
+				+ "Credits int);");
 		stm.executeUpdate(createTable);
 		// close the statement stream and the database connection
 		stm.close();
@@ -146,5 +159,21 @@ public class DatabaseController {
 		} else {
 			return false;
 		}
+	}
+
+	public static String getUrl() {
+		return url;
+	}
+
+	public static String getUser() {
+		return user;
+	}
+
+	public static String getSchema() {
+		return schema;
+	}
+	
+	public static String getTable() {
+		return table;
 	}
 }
