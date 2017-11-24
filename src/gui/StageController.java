@@ -7,7 +7,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -172,6 +171,7 @@ public class StageController extends Application {
 			gridPane.setVgap(10);
 
 			root.getChildren().add(gridPane);
+			stage.setTitle("Administration");
 		}
 
 	}
@@ -180,17 +180,26 @@ public class StageController extends Application {
 
 		Button loginButton;
 		Button registerButton;
+		Button exitButton;
 
-		public User(Parent root, Stage stage) {
-			super(root);
+		public User(Group root, Stage stage) {
+			super(root, 600, 550);
 
 			// register-login scene
 			loginButton = new Button("Log in");
 			registerButton = new Button("Sign up");
+			exitButton = new Button("Back");
 			HBox hbox3 = new HBox();
-			hbox3.getChildren().addAll(loginButton, registerButton);
+			hbox3.getChildren().addAll(loginButton, registerButton, exitButton);
 			hbox3.setAlignment(Pos.CENTER);
 			hbox3.setSpacing(20);
+	
+			root.getChildren().add(hbox3);
+			stage.setTitle("User");
+			
+			exitButton.setOnAction(e -> {
+				stage.setScene(new HomePage(new Group(), stage));
+			});
 
 			loginButton.setOnAction(e -> {
 				stage.setScene(new Login(new Group(), stage));
@@ -211,7 +220,7 @@ public class StageController extends Application {
 		Button submitButton;
 		VBox vbox;
 
-		public Login(Parent root, Stage stage) {
+		public Login(Group root, Stage stage) {
 			super(root);
 
 			usernameL = new Label("Username: ");
@@ -232,7 +241,7 @@ public class StageController extends Application {
 
 			submitButton = new Button("Login");
 
-			submitButton.setOnAction(e -> {
+			submitButton.setOnAction(event -> {
 				try {
 					DatabaseController.validateRecord(unTF.getText(), pwTF.getText());
 					new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!")
@@ -247,6 +256,8 @@ public class StageController extends Application {
 			vbox.getChildren().addAll(usernameL, unTF, passwordL, pwTF, submitButton);
 			vbox.setSpacing(10);
 			vbox.setAlignment(Pos.CENTER);
+			
+			root.getChildren().add(vbox);
 		}
 
 	}
@@ -269,45 +280,77 @@ public class StageController extends Application {
 		TextField logoTF;
 		Button registerButton;
 
-		public Register(Parent root, Stage stage) {
+		public Register(Group root, Stage stage) {
 			super(root);
 			gridPane = new GridPane();
-
-			firstNameL = new Label("First name");
-			fnTF = new TextField();
-			fnTF.setPromptText("First name");
-			gridPane.add(firstNameL, 0, 0);
-			gridPane.add(fnTF, 1, 0);
-
+			
+			// initialise girdPane items
+			firstNameL = new Label("First Name");
 			lastNameL = new Label("Last name");
-			lnTF = new TextField();
-			lnTF.setPromptText("Last name");
-			gridPane.add(lastNameL, 0, 1);
-			gridPane.add(lnTF, 1, 1);
-
 			groupNumL = new Label("Group");
-			gnTF = new TextField();
-			gnTF.setPromptText("Group");
-			gridPane.add(groupNumL, 0, 2);
-			gridPane.add(gnTF, 1, 2);
-
 			usernameL = new Label("New Username");
-			unTF = new TextField();
-			unTF.setPromptText("New Username");
-			gridPane.add(usernameL, 0, 3);
-			gridPane.add(unTF, 1, 3);
-
 			passwordL = new Label("New Password");
-			pwdTF = new TextField();
-			pwdTF.setPromptText("New Password");
-			gridPane.add(passwordL, 0, 4);
-			gridPane.add(pwdTF, 1, 4);
-
 			carNameL = new Label("New Car Name");
+			logoL = new Label("Logo");
+			fnTF = new TextField();
+			lnTF = new TextField();
+			gnTF = new TextField();
+			unTF = new TextField();
+			pwdTF = new TextField();
 			cnTF = new TextField();
+			logoTF = new TextField();
+			registerButton = new Button("Submit");
+			
+			// setting text field prompt
+			fnTF.setPromptText("First name");
+			lnTF.setPromptText("Last name");
+			gnTF.setPromptText("Group");
+			unTF.setPromptText("New Username");
+			pwdTF.setPromptText("New Password");
 			cnTF.setPromptText("New Car Name");
+			logoTF.setPromptText("logo");
+		
+			// add labels to gridPane
+			gridPane.add(firstNameL, 0, 0);
+			gridPane.add(lastNameL, 0, 1);
+			gridPane.add(groupNumL, 0, 2);
+			gridPane.add(usernameL, 0, 3);
+			gridPane.add(passwordL, 0, 4);
 			gridPane.add(carNameL, 0, 5);
+			gridPane.add(logoL, 0, 8);
+			
+			// add text fields to gridPane
+			gridPane.add(fnTF, 1, 0);			
+			gridPane.add(lnTF, 1, 1);
+			gridPane.add(gnTF, 1, 2);
+			gridPane.add(unTF, 1, 3);
+			gridPane.add(pwdTF, 1, 4);
 			gridPane.add(cnTF, 1, 5);
+			gridPane.add(logoTF, 1, 8);
+			
+			// add button to gridPane
+			gridPane.add(registerButton, 1, 9);
+			
+			// configure gridPane
+			gridPane.setVgap(10);
+			gridPane.setAlignment(Pos.CENTER);
+			root.getChildren().add(gridPane);
+			stage.setTitle("Register");
+			
+			registerButton.setOnAction(event -> {
+				try {
+					DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(), Integer.valueOf(gnTF.getText()),
+							unTF.getText(), pwdTF.getText(), cnTF.getText(), logoTF.getText());
+					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!")
+							.showAndWait();
+					stage.setScene(new User(new Group(), stage));
+				} catch (SQLException e1) {
+					new Alert(AlertType.ERROR,
+							"User: " + fnTF.getText() + " not found, you must be part of the class to register. " + e1.getMessage())
+									.showAndWait();
+					
+				}
+			});
 
 			/*
 			 * Label creditL = new Label("Credit"); TextField creditTF = new TextField();
@@ -318,32 +361,6 @@ public class StageController extends Application {
 			 * scoreTF.setPromptText("score"); gridPane.add(scoreL, 0, 7);
 			 * gridPane.add(scoreTF, 1, 7);
 			 */
-
-			logoL = new Label("Logo");
-			logoTF = new TextField();
-			logoTF.setPromptText("logo");
-			gridPane.add(logoL, 0, 8);
-			gridPane.add(logoTF, 1, 8);
-
-			registerButton = new Button("Submit");
-			registerButton.setOnAction(e -> {
-				try {
-					DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(),
-							Integer.getInteger(gnTF.getText()), unTF.getText(), pwdTF.getText(), cnTF.getText(),
-							logoTF.getText());
-					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!")
-							.showAndWait();
-				} catch (SQLException e1) {
-					new Alert(AlertType.ERROR,
-							"User: " + fnTF.getText() + " not found, you must be part of the class to register.")
-									.showAndWait();
-				}
-			});
-
-			gridPane.add(registerButton, 1, 9);
-			gridPane.setVgap(10);
-
-			gridPane.setAlignment(Pos.CENTER);
 		}
 
 	}

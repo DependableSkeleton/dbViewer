@@ -99,7 +99,7 @@ public class DatabaseController {
 		// sql statement to create the table
 		stm = database.createStatement();
 		stm.executeUpdate("CREATE TABLE players (FirstName VARCHAR (20) NOT NULL, LastName VARCHAR (20) NOT NULL, "
-				+ "GroupNumber int, PerferedCarName VARCHAR (20), Logo VARCHAR (20), Score int, Username VARCHAR(20), "
+				+ "GroupNumber int, CarName VARCHAR (20), Logo VARCHAR (20), Score int, Username VARCHAR(20), "
 				+ "Pass VARCHAR (20), Credits int);");
 		// use for loop to insert all student records
 		for (int i = 0; i < lastName.size(); i++) {
@@ -127,19 +127,27 @@ public class DatabaseController {
 
 	public static boolean validateRecord(String firstName, String lastName, int groupNumber, String username,
 			String password, String carName, String logo) throws SQLException {
-		String recordCheck = ("SELECT * FROM players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName
-				+ "' AND GroupNum ='" + groupNumber + "'");
-		ResultSet rs = stm.executeQuery(recordCheck);
-		// if the record is not found and SQLException will be thrown and caught
+		ResultSet rs;
+		
+		database = DriverManager.getConnection(url, user, pass);
+		database.setCatalog("students");
+		stm = database.createStatement();
+		rs = stm.executeQuery("SELECT * FROM players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName
+				+ "' AND GroupNumber ='" + groupNumber + "';");
+		// if the record is not found an SQLException will be thrown and caught
 		if (rs.next()) {
 			// Now create an update statement to add all the other fields;
-			String updateRecord = "UPDATE players SET Username = '" + username + "', " + "Password = '" + password
-					+ "', Car  = '" + carName + "', Logo = '" + logo
-					+ "',  Score = 0,   Credits = 0 WHERE FirstName LIKE '" + firstName + "' AND LastName LIKE '"
+			String updateRecord = "UPDATE players SET Username = '" + username + "', " + "Pass = '" + password
+					+ "', CarName  = '" + carName + "', Logo = '" + logo
+					+ "', Credits = 0 WHERE FirstName LIKE '" + firstName + "' AND LastName LIKE '"
 					+ lastName + "' AND GroupNumber =" + groupNumber + ";";
 			stm.executeUpdate(updateRecord);
+			stm.close();
+			database.close();
 			return true;
 		} else {
+			stm.close();
+			database.close();
 			return false;
 		}
 	}
