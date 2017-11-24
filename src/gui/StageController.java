@@ -243,12 +243,15 @@ public class StageController extends Application {
 
 			submitButton.setOnAction(event -> {
 				try {
-					DatabaseController.validateRecord(unTF.getText(), pwTF.getText());
-					new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!")
-							.showAndWait();
-				} catch (SQLException e1) {
-					new Alert(AlertType.ERROR,
-							"User: " + unTF.getText() + " not found, you must be registered to login.").showAndWait();
+					if (DatabaseController.validateRecord(unTF.getText(), pwTF.getText())) {
+						new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!")
+						.showAndWait();
+					} else {
+						new Alert(AlertType.ERROR, "User: " + unTF.getText() + " not found, you must be registered to login.").showAndWait();
+						stage.setScene(new User(new Group(), stage));
+					}
+				} catch (SQLException e) {
+					new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 				}
 			});
 
@@ -273,7 +276,7 @@ public class StageController extends Application {
 		Label usernameL;
 		TextField unTF;
 		Label passwordL;
-		TextField pwdTF;
+		TextField pwTF;
 		Label carNameL;
 		TextField cnTF;
 		Label logoL;
@@ -296,7 +299,7 @@ public class StageController extends Application {
 			lnTF = new TextField();
 			gnTF = new TextField();
 			unTF = new TextField();
-			pwdTF = new TextField();
+			pwTF = new TextField();
 			cnTF = new TextField();
 			logoTF = new TextField();
 			registerButton = new Button("Submit");
@@ -306,7 +309,7 @@ public class StageController extends Application {
 			lnTF.setPromptText("Last name");
 			gnTF.setPromptText("Group");
 			unTF.setPromptText("New Username");
-			pwdTF.setPromptText("New Password");
+			pwTF.setPromptText("New Password");
 			cnTF.setPromptText("New Car Name");
 			logoTF.setPromptText("logo");
 		
@@ -324,7 +327,7 @@ public class StageController extends Application {
 			gridPane.add(lnTF, 1, 1);
 			gridPane.add(gnTF, 1, 2);
 			gridPane.add(unTF, 1, 3);
-			gridPane.add(pwdTF, 1, 4);
+			gridPane.add(pwTF, 1, 4);
 			gridPane.add(cnTF, 1, 5);
 			gridPane.add(logoTF, 1, 8);
 			
@@ -340,7 +343,7 @@ public class StageController extends Application {
 			registerButton.setOnAction(event -> {
 				try {
 					DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(), Integer.valueOf(gnTF.getText()),
-							unTF.getText(), pwdTF.getText(), cnTF.getText(), logoTF.getText());
+							unTF.getText(), pwTF.getText(), cnTF.getText(), logoTF.getText());
 					new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!")
 							.showAndWait();
 					stage.setScene(new User(new Group(), stage));

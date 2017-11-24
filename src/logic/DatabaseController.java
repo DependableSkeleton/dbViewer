@@ -114,10 +114,12 @@ public class DatabaseController {
 	}
 
 	public static boolean validateRecord(String username, String password) throws SQLException {
-		String recordCheck = ("SELECT * FROM players WHERE Username = '" + username + "' AND Password ='" + password
+		ResultSet rs;
+		database = DriverManager.getConnection(url, user, pass);
+		database.setCatalog("students");
+		stm = database.createStatement();
+		rs = stm.executeQuery("SELECT * FROM players WHERE Username = '" + username + "' AND Pass ='" + password
 				+ "';");
-		ResultSet rs = stm.executeQuery(recordCheck);
-		// if the record is not found and SQLException will be thrown and caught
 		if (rs.next()) {
 			return true;
 		} else {
