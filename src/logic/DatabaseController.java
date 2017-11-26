@@ -9,14 +9,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class DatabaseController {
 
@@ -44,19 +44,19 @@ public class DatabaseController {
 			for (int i = 3; i < firstChild.getLength(); i++) {
 				if (firstChild.item(i).getLocalName() != null) {
 					switch (firstChild.item(i).getLocalName()) {
-						case "user":
-							user = firstChild.item(i).getTextContent();
-							break;
-						case "pass":
-							pass = firstChild.item(i).getTextContent();
-							break;
-						case "url":
-							url = firstChild.item(i).getTextContent();
-							break;
-						case "use_ssl":
-							if (firstChild.item(i).getTextContent().compareTo("false") == 0) {
-								url += "?useSSL=false";
-							}
+					case "user":
+						user = firstChild.item(i).getTextContent();
+						break;
+					case "pass":
+						pass = firstChild.item(i).getTextContent();
+						break;
+					case "url":
+						url = firstChild.item(i).getTextContent();
+						break;
+					case "use_ssl":
+						if (firstChild.item(i).getTextContent().compareTo("false") == 0) {
+							url += "?useSSL=false";
+						}
 					}
 				}
 			}
@@ -113,44 +113,72 @@ public class DatabaseController {
 		inputStream.close();
 	}
 
-	public static boolean validateRecord(String username, String password) throws SQLException {
+	public static boolean validateRecord(String username, String password) {
 		ResultSet rs;
-		database = DriverManager.getConnection(url, user, pass);
-		database.setCatalog("students");
-		stm = database.createStatement();
-		rs = stm.executeQuery("SELECT * FROM players WHERE Username = '" + username + "' AND Pass ='" + password
-				+ "';");
-		if (rs.next()) {
-			return true;
-		} else {
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			rs = stm.executeQuery(
+					"SELECT * FROM players WHERE Username = '" + username + "' AND Pass ='" + password + "';");
+			if (rs.next()) {
+				new Alert(AlertType.INFORMATION, "User: " + username + " found, registration complete!").showAndWait();
+				return true;
+			} else {
+				new Alert(AlertType.ERROR,
+						"User: " + username + " not found, you must be part of the class to register. ").showAndWait();
+				return false;
+			}
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR,
+					"User: " + username + " not found, you must be part of the class to register. " + e.getMessage())
+							.showAndWait();
 			return false;
 		}
 	}
 
 	public static boolean validateRecord(String firstName, String lastName, int groupNumber, String username,
-			String password, String carName, String logo) throws SQLException {
+			String password, String carName, String logo) {
 		ResultSet rs;
-		
-		database = DriverManager.getConnection(url, user, pass);
-		database.setCatalog("students");
-		stm = database.createStatement();
-		rs = stm.executeQuery("SELECT * FROM players WHERE FirstName = '" + firstName + "' AND LastName ='" + lastName
-				+ "' AND GroupNumber ='" + groupNumber + "';");
-		// if the record is not found an SQLException will be thrown and caught
-		if (rs.next()) {
-			// Now create an update statement to add all the other fields;
-			String updateRecord = "UPDATE players SET Username = '" + username + "', " + "Pass = '" + password
-					+ "', CarName  = '" + carName + "', Logo = '" + logo
-					+ "', Credits = 0 WHERE FirstName LIKE '" + firstName + "' AND LastName LIKE '"
-					+ lastName + "' AND GroupNumber =" + groupNumber + ";";
-			stm.executeUpdate(updateRecord);
-			stm.close();
-			database.close();
-			return true;
-		} else {
-			stm.close();
-			database.close();
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			rs = stm.executeQuery("SELECT * FROM players WHERE FirstName = '" + firstName + "' AND LastName ='"
+					+ lastName + "' AND GroupNumber ='" + groupNumber + "';");
+			// if the record is not found an SQLException will be thrown and caught
+			if (rs.next()) {
+				// Now create an update statement to add all the other fields;
+				String updateRecord = "UPDATE players SET Username = '" + username + "', " + "Pass = '" + password
+						+ "', CarName  = '" + carName + "', Logo = '" + logo + "', Credits = 0 WHERE FirstName LIKE '"
+						+ firstName + "' AND LastName LIKE '" + lastName + "' AND GroupNumber =" + groupNumber + ";";
+				stm.executeUpdate(updateRecord);
+				stm.close();
+				database.close();
+				return true;
+			} else {
+				stm.close();
+				database.close();
+				return false;
+			}
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 			return false;
+		}
+	}
+
+	public static String getPrefCarName(String username, String password) {
+		ResultSet rs;
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			rs = stm.executeQuery(
+					"SELECT CarName FROM players WHERE Username = '" + username + "' AND Pass ='" + password + "';");
+			return rs.toString();
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+			return null;
 		}
 	}
 

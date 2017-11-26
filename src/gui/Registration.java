@@ -1,14 +1,11 @@
 package gui;
 
-import java.sql.SQLException;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import logic.DatabaseController;
@@ -87,19 +84,15 @@ public class Registration extends Scene {
 		gridPane.setAlignment(Pos.CENTER);
 		root.getChildren().add(gridPane);
 		stage.setTitle("Register");
-		
+
 		registerButton.setOnAction(event -> {
-			try {
-				DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(), Integer.valueOf(gnTF.getText()),
-						unTF.getText(), pwTF.getText(), cnTF.getText(), logoTF.getText());
-				new Alert(AlertType.INFORMATION, "User: " + fnTF.getText() + " found, registration complete!")
-						.showAndWait();
+			// validate record calls all required alerts and errors
+			// the user is returned to the previous menu either way
+			if (DatabaseController.validateRecord(fnTF.getText(), lnTF.getText(), Integer.valueOf(gnTF.getText()),
+					unTF.getText(), pwTF.getText(), cnTF.getText(), logoTF.getText())) {
 				stage.setScene(new User(new Group(), stage));
-			} catch (SQLException e1) {
-				new Alert(AlertType.ERROR,
-						"User: " + fnTF.getText() + " not found, you must be part of the class to register. " + e1.getMessage())
-								.showAndWait();
-				
+			} else {
+				stage.setScene(new User(new Group(), stage));
 			}
 		});
 	}

@@ -1,17 +1,15 @@
 package gui;
 
-import java.sql.SQLException;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import logic.Car;
 import logic.DatabaseController;
 
 public class Login extends Scene {
@@ -44,22 +42,20 @@ public class Login extends Scene {
 		submitButton = new Button("Login");
 
 		submitButton.setOnAction(event -> {
-			try {
-				if (DatabaseController.validateRecord(unTF.getText(), pwTF.getText())) {
-					new Alert(AlertType.INFORMATION, "User: " + unTF.getText() + " found, login complete!")
-					.showAndWait();
-				} else {
-					new Alert(AlertType.ERROR, "User: " + unTF.getText() + " not found, you must be registered to login.").showAndWait();
-					stage.setScene(new User(new Group(), stage));
-				}
-			} catch (SQLException e) {
-				new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+			// validate login
+			if (DatabaseController.validateRecord(unTF.getText(), pwTF.getText())) {
+				// start game with car
+				stage.setScene(new Game(new Group(), stage,
+						new Car(DatabaseController.getPrefCarName(unTF.getText(), pwTF.getText()))));
+			} else {
+				// return to previous scene
+				stage.setScene(new User(new Group(), stage));
 			}
 		});
 		vbox = new VBox();
 		vbox.getChildren().addAll(usernameL, unTF, passwordL, pwTF, submitButton);
 		vbox.setSpacing(10);
-		vbox.setAlignment(Pos.CENTER);	
+		vbox.setAlignment(Pos.CENTER);
 		root.getChildren().add(vbox);
 	}
 }
