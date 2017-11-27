@@ -166,6 +166,37 @@ public class DatabaseController {
 			return false;
 		}
 	}
+	
+	public static ArrayList<Player> getPlayers() {
+		ResultSet rs;
+		ArrayList<Player> players = new ArrayList<Player>();
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			rs = stm.executeQuery("SELECT * FROM players ORDER BY FirstName");
+			while (rs.next()) {
+				Player player = new Player();
+				player.setFirstName(rs.getString(1));
+				player.setLastName(rs.getString(2));
+				player.setGroupNum(rs.getInt(3));
+				player.setCarName(rs.getString(4));
+				player.setLogo(rs.getString(5));
+				player.setScore(rs.getInt(6));
+				player.setUsername(rs.getString(7));
+				player.setCredits(rs.getInt(9));
+				players.add(player);
+			}
+			System.out.print(players.get(0).getFirstName());
+			System.out.print(players.get(0).getLastName());
+			System.out.print(players.get(1).getFirstName());
+			System.out.print(players.get(1).getLastName());
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+			return null;
+		}
+		return players;
+	}
 
 	public static String getPrefCarName(String username, String password) {
 		ResultSet rs;

@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,7 +40,7 @@ public class Game extends Scene {
 	MediaPlayer mediaPlayer;
 	MediaView mediaView;
 	Button playButton;
-	TextField gameScreen;
+	TextArea gameScreen;
 
 	protected Game(Group root, Stage stage, Car playerCar) {
 		super(root);
@@ -60,8 +60,9 @@ public class Game extends Scene {
 		
 		playButton = new Button("Start Game");
 		
-		gameScreen = new TextField();
-		gameScreen.setPrefSize(1000, 700);
+		gameScreen = new TextArea();
+		gameScreen.setPrefColumnCount(50);
+		gameScreen.setPrefRowCount(25);
 		
 		header.getChildren().addAll(sheridanImg,headerL,groupImg);
 		header.setAlignment(Pos.CENTER_RIGHT);
@@ -75,6 +76,20 @@ public class Game extends Scene {
 			stage.setScene(new User(new Group(), stage));
 		}
 		mediaPlayer = new MediaPlayer(media);
+		
+		gameOptions.getChildren().addAll(creditRefill, musicControls, score);
+		gameOptions.setAlignment(Pos.BASELINE_RIGHT);	
+		
+		gamePane.add(gameScreen, 0, 0);
+		gamePane.add(playButton, 0, 1);
+		gamePane.setAlignment(Pos.CENTER);
+				
+		mainPane.setTop(header);
+		mainPane.setRight(gameOptions);
+		mainPane.setCenter(gamePane);
+				
+		stage.setTitle("Car Racing");
+		root.getChildren().add(mainPane);
 		
 		creditRefill.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
 			stage.setScene(new Refill(new Group(), stage, playerCar));
@@ -93,19 +108,5 @@ public class Game extends Scene {
 		playButton.setOnAction(event -> {
 			UseMyCar.startGame(playerCar, gameScreen);
 		});
-		
-		gameOptions.getChildren().addAll(creditRefill, musicControls, score);
-		gameOptions.setAlignment(Pos.BASELINE_RIGHT);	
-		
-		gamePane.add(gameScreen, 0, 0);
-		gamePane.add(playButton, 0, 1);
-		gamePane.setAlignment(Pos.CENTER);
-				
-		mainPane.setTop(header);
-		mainPane.setRight(gameOptions);
-		mainPane.setCenter(gamePane);
-				
-		stage.setTitle("Car Racing");
-		root.getChildren().add(mainPane);
 	}
 }

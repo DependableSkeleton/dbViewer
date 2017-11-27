@@ -17,7 +17,7 @@ public class Administration extends Scene {
 
 	Button createTable;
 	Button createdb;
-	Button show;
+	Button viewdb;
 	Button exitButton;
 	GridPane gridPane;
 
@@ -25,7 +25,7 @@ public class Administration extends Scene {
 		super(root, 600, 550);
 		createTable = new Button("Create table");
 		createdb = new Button("Initalize database");
-		show = new Button("View database");
+		viewdb = new Button("View database");
 		exitButton = new Button("Exit");
 
 		exitButton.setOnAction(event -> {
@@ -53,11 +53,15 @@ public class Administration extends Scene {
 						.showAndWait();
 			}
 		});
+		
+		viewdb.setOnAction(event -> {
+			stage.setScene(new ViewTable(new Group(), stage));
+		});
 
 		gridPane = new GridPane();
 		gridPane.add(createTable, 0, 0);
 		gridPane.add(createdb, 1, 0);
-		gridPane.add(show, 2, 0);
+		gridPane.add(viewdb, 2, 0);
 		gridPane.add(exitButton, 2, 4);
 		gridPane.setAlignment(Pos.CENTER);
 		gridPane.setHgap(10);
