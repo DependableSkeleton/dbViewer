@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -9,6 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import logic.Car;
+import logic.DatabaseController;
+import logic.Player;
 
 public class Refill extends Scene {
 
@@ -34,7 +37,12 @@ public class Refill extends Scene {
 		creditRefillForm.getChildren().addAll(creditsL, creditsTF, refillButton, exitButton);
 		creditRefillForm.setSpacing(20);
 		creditRefillForm.setAlignment(Pos.CENTER);
-
+		
+		refillButton.setOnAction(event -> {
+			DatabaseController.setCredits(playerCar.getCarName(), Integer.parseInt(creditsTF.getText()));
+			stage.setScene(new Game(new Group(), stage, playerCar));
+		});
+		
 		exitButton.setOnAction(event -> {
 			stage.setScene(new Game(new Group(), stage, playerCar));
 		});

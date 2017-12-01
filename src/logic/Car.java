@@ -1,6 +1,6 @@
 package logic;
 
-public class Car 
+public class Car
 {
     /*****************************************************************
      *                     Attributes                                *

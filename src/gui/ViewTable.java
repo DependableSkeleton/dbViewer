@@ -3,6 +3,7 @@ package gui;
 import javafx.collections.FXCollections;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -13,9 +14,13 @@ import logic.Player;
 public class ViewTable extends Scene {
 	
 	TableView<Player> tbl;
+	Button homeButton;
 	
 	protected ViewTable (Group root, Stage stage) {
 		super(root);
+		
+		Button homeButton = new Button("homeButton");
+		
 		tbl = new TableView<Player>();
 		tbl.setItems(FXCollections.observableArrayList(DatabaseController.getPlayers()));
 		TableColumn<Player,String> firstNameCol = new TableColumn<Player,String>("First Name");

@@ -22,6 +22,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import logic.Car;
+import logic.DatabaseController;
 import logic.UseMyCar;
 
 public class Game extends Scene {
@@ -40,7 +41,8 @@ public class Game extends Scene {
 	MediaPlayer mediaPlayer;
 	MediaView mediaView;
 	Button playButton;
-	TextArea gameScreen;
+	Button homeButton;
+	static TextArea gameScreen;
 
 	protected Game(Group root, Stage stage, Car playerCar) {
 		super(root);
@@ -56,9 +58,11 @@ public class Game extends Scene {
 		musicControls = new ImageView(new Image(new File("src/assets/musicImg.jpg").toURI().toString()));
 		score = new ImageView(new Image(new File("src/assets/scoreImg.png").toURI().toString()));
 		
+		
 		headerL = new Label("Car racing game");
 		
 		playButton = new Button("Start Game");
+		homeButton = new Button("Exit");
 		
 		gameScreen = new TextArea();
 		gameScreen.setPrefColumnCount(50);
@@ -82,6 +86,7 @@ public class Game extends Scene {
 		
 		gamePane.add(gameScreen, 0, 0);
 		gamePane.add(playButton, 0, 1);
+		gamePane.add(homeButton, 1, 1);
 		gamePane.setAlignment(Pos.CENTER);
 				
 		mainPane.setTop(header);
@@ -93,20 +98,30 @@ public class Game extends Scene {
 		
 		creditRefill.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
 			stage.setScene(new Refill(new Group(), stage, playerCar));
-			event.consume();
-	     });
-		
+		});
+
 		musicControls.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
 			if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
 				mediaPlayer.play();
 			} else {
 				mediaPlayer.stop();
 			}
-			event.consume();
-	     });
-		
-		playButton.setOnAction(event -> {
-			UseMyCar.startGame(playerCar, gameScreen);
 		});
+
+		playButton.setOnAction(event -> {
+			if (DatabaseController.getCredits(playerCar.getCarName()) > 0) {
+				UseMyCar.startGame(playerCar);
+			} else {
+				new Alert(AlertType.ERROR, "Error submitting query. ");
+			}
+		});
+
+		homeButton.setOnAction(event -> {
+			stage.setScene(new HomePage(new Group(), stage));
+		});
+	}
+
+	public static TextArea getGameScreen() {
+		return gameScreen;
 	}
 }

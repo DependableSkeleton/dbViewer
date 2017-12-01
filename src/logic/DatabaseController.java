@@ -99,7 +99,7 @@ public class DatabaseController {
 		// sql statement to create the table
 		stm = database.createStatement();
 		stm.executeUpdate("CREATE TABLE players (FirstName VARCHAR (20) NOT NULL, LastName VARCHAR (20) NOT NULL, "
-				+ "GroupNumber int, CarName VARCHAR (20), Logo VARCHAR (20), Score int, Username VARCHAR(20), "
+				+ "GroupNumber int, CarName VARCHAR (20), Logo VARCHAR (20), Score int DEFAULT 0, Username VARCHAR(20), "
 				+ "Pass VARCHAR (20), Credits int);");
 		// use for loop to insert all student records
 		for (int i = 0; i < lastName.size(); i++) {
@@ -187,13 +187,8 @@ public class DatabaseController {
 				player.setCredits(rs.getInt(9));
 				players.add(player);
 			}
-			System.out.print(players.get(0).getFirstName());
-			System.out.print(players.get(0).getLastName());
-			System.out.print(players.get(1).getFirstName());
-			System.out.print(players.get(1).getLastName());
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
-			return null;
 		}
 		return players;
 	}
@@ -206,17 +201,61 @@ public class DatabaseController {
 			stm = database.createStatement();
 			rs = stm.executeQuery(
 					"SELECT CarName FROM players WHERE Username = '" + username + "' AND Pass ='" + password + "';");
-			return rs.toString();
+			rs.next();
+			return rs.getString(1);
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 			return null;
+		}
+	}
+	
+	public static int getCredits(String carName) {
+		ResultSet rs;
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			rs = stm.executeQuery(
+					"SELECT Credits FROM players WHERE CarName = '" + carName + "';");
+			rs.next();
+			return rs.getInt(1);
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+			return 0;
+		}
+	}
+	
+	public static void setScore(String carName, int score) {
+		ResultSet rs;
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			stm.executeUpdate("UPDATE players SET Score = '" + score + "' WHERE CarName = '" + carName + "';");
+			stm.close();
+			database.close();
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+		}
+	}
+	
+	public static void setCredits(String carName, int credits) {
+		ResultSet rs;
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			stm.executeUpdate("UPDATE players SET Credits = '" + credits + "' WHERE CarName = '" + carName + "';");
+			stm.close();
+			database.close();
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 		}
 	}
 
 	public static String getUrl() {
 		return url;
 	}
-
 	public static String getUser() {
 		return user;
 	}
