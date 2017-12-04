@@ -87,7 +87,7 @@ public class Game extends Scene {
 		gameOptions.getChildren().addAll(creditRefill, musicControls, score);
 		gameOptions.setAlignment(Pos.BASELINE_RIGHT);	
 		
-		gamePane.add(gameScreen, 0, 0);
+		//gamePane.add(gameScreen, 0, 0);
 		gamePane.add(playButton, 0, 1);
 		gamePane.add(homeButton, 1, 1);
 		gamePane.add(creditLabel, 2, 1);
