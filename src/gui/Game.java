@@ -2,6 +2,8 @@ package gui;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.concurrent.CountDownLatch;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -23,6 +25,8 @@ import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
 import logic.Car;
 import logic.DatabaseController;
+import logic.GameState;
+import logic.GameThread;
 import logic.UseMyCar;
 
 public class Game extends Scene {
@@ -43,9 +47,16 @@ public class Game extends Scene {
 	Button playButton;
 	Button homeButton;
 	static TextArea gameScreen;
-
+	GameState gameState;
+	GameThread gameThread;
+	
+	static CountDownLatch latch = new CountDownLatch(1);
+	UseMyCar useMyCar = new UseMyCar(gameThread, latch);
+	
 	protected Game(Group root, Stage stage, Car playerCar) {
 		super(root);
+		
+		gameState = GameState.FINISHED;
 		
 		mainPane = new BorderPane();
 		gamePane = new GridPane();
@@ -107,10 +118,19 @@ public class Game extends Scene {
 				mediaPlayer.stop();
 			}
 		});
+		
+		score.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+			stage.setScene(new Refill(new Group(), stage, playerCar));
+		});
 
 		playButton.setOnAction(event -> {
 			if (DatabaseController.getCredits(playerCar.getCarName()) > 0) {
-				UseMyCar.startGame(playerCar);
+				if (gameState == GameState.FINISHED) {
+					gameState = GameState.RUNNING;
+					gameScreen.clear();
+					GameThread.run(playerCar);
+					gameState = GameState.FINISHED;
+				}
 			} else {
 				new Alert(AlertType.ERROR, "Error submitting query. ");
 			}
@@ -120,8 +140,21 @@ public class Game extends Scene {
 			stage.setScene(new HomePage(new Group(), stage));
 		});
 	}
-
-	public static TextArea getGameScreen() {
-		return gameScreen;
+	
+	public static void print(String text) {
+		Platform.runLater(() -> gameScreen.appendText(text));
 	}
+
+	public static void println(String text) {
+		Platform.runLater(() -> gameScreen.appendText(text + "\n"));
+	}
+
+	public static void println() {
+		Platform.runLater(() -> gameScreen.appendText("\n"));
+	}
+	
+	public static void setLatch(CountDownLatch latch) {
+		Game.latch = latch;
+	}
+
 }

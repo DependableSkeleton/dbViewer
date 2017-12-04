@@ -123,8 +123,12 @@ public class DatabaseController {
 					"SELECT * FROM players WHERE Username = '" + username + "' AND Pass ='" + password + "';");
 			if (rs.next()) {
 				new Alert(AlertType.INFORMATION, "User: " + username + " found, registration complete!").showAndWait();
+				stm.close();
+				database.close();
 				return true;
 			} else {
+				stm.close();
+				database.close();
 				new Alert(AlertType.ERROR,
 						"User: " + username + " not found, you must be part of the class to register. ").showAndWait();
 				return false;
@@ -166,7 +170,7 @@ public class DatabaseController {
 			return false;
 		}
 	}
-	
+
 	public static ArrayList<Player> getPlayers() {
 		ResultSet rs;
 		ArrayList<Player> players = new ArrayList<Player>();
@@ -195,6 +199,7 @@ public class DatabaseController {
 
 	public static String getPrefCarName(String username, String password) {
 		ResultSet rs;
+		String name = null;
 		try {
 			database = DriverManager.getConnection(url, user, pass);
 			database.setCatalog("students");
@@ -202,29 +207,36 @@ public class DatabaseController {
 			rs = stm.executeQuery(
 					"SELECT CarName FROM players WHERE Username = '" + username + "' AND Pass ='" + password + "';");
 			rs.next();
-			return rs.getString(1);
+			name = rs.getString(1);
+			stm.close();
+			database.close();
+			return name;
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 			return null;
 		}
 	}
-	
+
 	public static int getCredits(String carName) {
 		ResultSet rs;
+		int credits = 0;
 		try {
 			database = DriverManager.getConnection(url, user, pass);
 			database.setCatalog("students");
 			stm = database.createStatement();
-			rs = stm.executeQuery(
-					"SELECT Credits FROM players WHERE CarName = '" + carName + "';");
-			rs.next();
-			return rs.getInt(1);
+			rs = stm.executeQuery("SELECT Credits FROM players WHERE CarName = '" + carName + "';");
+			while (rs.next()) {
+				credits = rs.getInt(1);
+			}
+			stm.close();
+			database.close();
+			return credits;
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 			return 0;
 		}
 	}
-	
+
 	public static void setScore(String carName, int score) {
 		ResultSet rs;
 		try {
@@ -238,7 +250,7 @@ public class DatabaseController {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
 		}
 	}
-	
+
 	public static void setCredits(String carName, int credits) {
 		ResultSet rs;
 		try {
@@ -256,6 +268,7 @@ public class DatabaseController {
 	public static String getUrl() {
 		return url;
 	}
+
 	public static String getUser() {
 		return user;
 	}
