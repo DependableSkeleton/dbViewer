@@ -225,6 +225,19 @@ public class DatabaseController {
 		}
 	}
 	
+	public static void setCredits(String carName, int credits) {
+		ResultSet rs;
+		try {
+			database = DriverManager.getConnection(url, user, pass);
+			database.setCatalog("students");
+			stm = database.createStatement();
+			stm.executeUpdate("UPDATE players SET Credits = '" + credits + "' WHERE CarName = '" + carName + "';");
+			stm.close();
+			database.close();
+		} catch (SQLException e) {
+			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+		}
+	}
 	public static void setScore(String carName, int score) {
 		ResultSet rs;
 		try {
@@ -239,17 +252,22 @@ public class DatabaseController {
 		}
 	}
 	
-	public static void setCredits(String carName, int credits) {
+	public static String getScore(String carName) {
 		ResultSet rs;
+		String score;
 		try {
 			database = DriverManager.getConnection(url, user, pass);
 			database.setCatalog("students");
 			stm = database.createStatement();
-			stm.executeUpdate("UPDATE players SET Credits = '" + credits + "' WHERE CarName = '" + carName + "';");
+			rs = stm.executeQuery("SELECT Score FROM players WHERE CarName = '" + carName + "';");
+			rs.next();
+			score = rs.getString(1);
 			stm.close();
 			database.close();
+			return score;
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
+			return null;
 		}
 	}
 

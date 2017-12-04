@@ -42,6 +42,7 @@ public class Game extends Scene {
 	MediaView mediaView;
 	Button playButton;
 	Button homeButton;
+	Label creditLabel;
 	static TextArea gameScreen;
 
 	protected Game(Group root, Stage stage, Car playerCar) {
@@ -64,12 +65,14 @@ public class Game extends Scene {
 		playButton = new Button("Start Game");
 		homeButton = new Button("Exit");
 		
+		creditLabel = new Label("Credits: " + DatabaseController.getCredits(playerCar.getCarName()));
+		
 		gameScreen = new TextArea();
 		gameScreen.setPrefColumnCount(50);
 		gameScreen.setPrefRowCount(25);
 		
 		header.getChildren().addAll(sheridanImg,headerL,groupImg);
-		header.setAlignment(Pos.CENTER_RIGHT);
+		header.setAlignment(Pos.CENTER); 
 		
 		//Music: https://www.bensound.com/royalty-free-music
 		//Track used: https://www.bensound.com/royalty-free-music/track/slow-motion
@@ -87,6 +90,7 @@ public class Game extends Scene {
 		gamePane.add(gameScreen, 0, 0);
 		gamePane.add(playButton, 0, 1);
 		gamePane.add(homeButton, 1, 1);
+		gamePane.add(creditLabel, 2, 1);
 		gamePane.setAlignment(Pos.CENTER);
 				
 		mainPane.setTop(header);
@@ -106,6 +110,10 @@ public class Game extends Scene {
 			} else {
 				mediaPlayer.stop();
 			}
+		});
+		
+		score.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+			stage.setScene(new Score(new Group(), stage, playerCar));
 		});
 
 		playButton.setOnAction(event -> {
