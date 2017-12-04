@@ -1,5 +1,9 @@
 package logic;
 
+import gui.Game;
+import javafx.scene.Group;
+import javafx.stage.Stage;
+
 public class UseMyCar {
 	
 	//final static Random gasInject = new Random();
@@ -12,7 +16,7 @@ public class UseMyCar {
 		return myInjection;
 	}
 	
-	public static void startGame(Car playerCar) {
+	public static void startGame(Car playerCar, Stage stage) {
 
 		boolean wasCrash = false;
 		
@@ -52,7 +56,7 @@ public class UseMyCar {
 
 		//Let's race for 30 seconds
 		int i = 1;
-		while (i < 60)
+		while (i < 5)
 		{
 			//if myFirstCar speedIncreaseStep is positive (Acceleration)
 			if (myFirstCar.getSpeedIncreaseStep() > 0){
@@ -131,18 +135,24 @@ public class UseMyCar {
 	    if (myFirstCar.getCurrentSpeed() == mySecondCar.getCurrentSpeed())
 	    	{
 	    	   System.out.println("\t\t" + "There is no winner for this Race ");
+	    	   DatabaseController.setCredits(playerCar.getCarName(), DatabaseController.getCredits(playerCar.getCarName()) - 1);
+		       stage.setScene(new Game(new Group(), stage, playerCar));
 	    	}
 	    else if (myFirstCar.getCurrentSpeed() > mySecondCar.getCurrentSpeed())
 	       {
 	          theWinner = myFirstCar.getCarName();
 	          System.out.println("\t\t" + "The winner of this Race is :  " + theWinner);
+	          DatabaseController.setCredits(playerCar.getCarName(), DatabaseController.getCredits(playerCar.getCarName()) - 1);
+	          stage.setScene(new Game(new Group(), stage, playerCar));
 	       }
 	    else
 	       {
 	          theWinner = mySecondCar.getCarName();	
 	          System.out.println("\t\t" + "The winner of this Race is :  " + theWinner);
-	          DatabaseController.setScore(playerCar.getCarName(), 1);
-       }
+	          DatabaseController.setScore(playerCar.getCarName(), DatabaseController.getScore(playerCar.getCarName()) + 1);
+	          DatabaseController.setCredits(playerCar.getCarName(), DatabaseController.getCredits(playerCar.getCarName()) - 1);
+	          stage.setScene(new Game(new Group(), stage, playerCar));
+	       }
 
        System.out.println();
        System.out.println();

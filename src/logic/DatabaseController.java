@@ -252,22 +252,22 @@ public class DatabaseController {
 		}
 	}
 	
-	public static String getScore(String carName) {
+	public static int getScore(String carName) {
 		ResultSet rs;
-		String score;
+		int score;
 		try {
 			database = DriverManager.getConnection(url, user, pass);
 			database.setCatalog("students");
 			stm = database.createStatement();
 			rs = stm.executeQuery("SELECT Score FROM players WHERE CarName = '" + carName + "';");
 			rs.next();
-			score = rs.getString(1);
+			score = rs.getInt(1);
 			stm.close();
 			database.close();
 			return score;
 		} catch (SQLException e) {
 			new Alert(AlertType.ERROR, "Error submitting query. " + e.getMessage()).showAndWait();
-			return null;
+			return 0;
 		}
 	}
 

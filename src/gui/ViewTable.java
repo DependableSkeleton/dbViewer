@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import logic.DatabaseController;
 import logic.Player;
@@ -14,12 +15,19 @@ import logic.Player;
 public class ViewTable extends Scene {
 	
 	TableView<Player> tbl;
+	BorderPane mainPane;
 	Button homeButton;
+	Button exitButton;
 	
 	protected ViewTable (Group root, Stage stage) {
 		super(root);
 		
+		mainPane = new BorderPane();
+		
 		Button homeButton = new Button("homeButton");
+		exitButton = new Button("Exit");
+
+		
 		
 		tbl = new TableView<Player>();
 		tbl.setItems(FXCollections.observableArrayList(DatabaseController.getPlayers()));
@@ -41,7 +49,13 @@ public class ViewTable extends Scene {
 		creditsCol.setCellValueFactory(new PropertyValueFactory("credits"));
 		 
 		tbl.getColumns().setAll(firstNameCol, lastNameCol, groupNumCol, carNameCol, logoCol, scoreCol, usernameCol, creditsCol);
-		root.getChildren().add(tbl);
+		mainPane.setTop(tbl);
+		mainPane.setBottom(exitButton);
+		root.getChildren().add(mainPane);
+		
+		exitButton.setOnAction(event -> {
+			stage.setScene(new HomePage(new Group(), stage));
+		});
 	}
 
 }

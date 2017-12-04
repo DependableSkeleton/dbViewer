@@ -43,9 +43,10 @@ public class Game extends Scene {
 	Button playButton;
 	Button homeButton;
 	Label creditLabel;
+	Label scoreLabel;
 	static TextArea gameScreen;
 
-	protected Game(Group root, Stage stage, Car playerCar) {
+	public Game(Group root, Stage stage, Car playerCar) {
 		super(root);
 		
 		mainPane = new BorderPane();
@@ -66,6 +67,7 @@ public class Game extends Scene {
 		homeButton = new Button("Exit");
 		
 		creditLabel = new Label("Credits: " + DatabaseController.getCredits(playerCar.getCarName()));
+		scoreLabel = new Label("Score: " + DatabaseController.getScore(playerCar.getCarName()));
 		
 		gameScreen = new TextArea();
 		gameScreen.setPrefColumnCount(50);
@@ -91,6 +93,7 @@ public class Game extends Scene {
 		gamePane.add(playButton, 0, 1);
 		gamePane.add(homeButton, 1, 1);
 		gamePane.add(creditLabel, 2, 1);
+		gamePane.add(scoreLabel, 2, 2);
 		gamePane.setAlignment(Pos.CENTER);
 				
 		mainPane.setTop(header);
@@ -118,7 +121,7 @@ public class Game extends Scene {
 
 		playButton.setOnAction(event -> {
 			if (DatabaseController.getCredits(playerCar.getCarName()) > 0) {
-				UseMyCar.startGame(playerCar);
+				UseMyCar.startGame(playerCar, stage);
 			} else {
 				new Alert(AlertType.ERROR, "Error submitting query. ");
 			}
